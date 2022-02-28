@@ -2,8 +2,8 @@ import {gql,useQuery} from '@apollo/client';
 import Dishes from "./dishes"
 import {useContext, useState} from 'react';
 import Router from 'next/router';
-
-import AppContext from "./context"
+import AppContext from "./context";
+import RestaurantPage from './restaurantPage';
 import {
   Button,
   Card,
@@ -15,7 +15,7 @@ import {
   Row,
   Col} from "reactstrap";
 
-function RestaurantList(props){
+function RestaurantList(props) {
   const[restaurantID, setRestaurantID] = useState(0)
   const {cart, user } = useContext(AppContext);
   const [state, setState] = useState(cart);
@@ -69,25 +69,24 @@ if(searchQuery.length > 0){
         </CardBody>
         <div className="card-footer">
         
-        <Button id={res.name} color="info" disabled={!activeUser} onClick={()=> Router.push(`/dishes/${res.name}`)} 
+        <Button id={res.name} color="info"  onClick={activeUser ? (()=> setRestaurantID(res.id)) : (()=> Router.push("/login"))} 
          >{res.name}</Button>
-        {/* onClick={()=> setRestaurantID(res.id)} */}
         </div>
       </Card>
     </Col>
   ))
 
-  return(
+  return(<>
     <Container>
     <Row xs='3'>
       {restList}
     </Row>
-  
     <Row xs='3'>
     {renderDishes(restaurantID)}
     </Row>
     </Container>
-  )
+    {/* <RestaurantPage name={data} id={restaurantID}/> */}
+  </>)
 } else {
   return <h1> No Restaurants Found</h1>
 }

@@ -16,7 +16,7 @@ module.exports = {
    */
 
   create: async (ctx) => {
-    const { address, amount, dishes, token, city, state } = JSON.parse(
+    const { address, amount, dishes, token, city, state, firstName, lastName } = JSON.parse(
       ctx.request.body
     );
     const stripeAmount = Math.floor(amount * 100);
@@ -38,6 +38,9 @@ module.exports = {
       dishes,
       city,
       state,
+      firstName,
+      lastName,
+      token
     });
 
     return order;

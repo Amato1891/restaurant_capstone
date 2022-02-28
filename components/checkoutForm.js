@@ -6,30 +6,54 @@ import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import CardSection from "./cardSection";
 import AppContext from "./context";
 import Cookies from "js-cookie";
+import Router from "next/router";
 
 function CheckoutForm() {
   const [data, setData] = useState({
+    firstName: "",
+    lastName: "",
     address: "",
     city: "",
     state: "",
     stripe_id: "",
   });
+
+  function pushToHome() {
+    Router.push('/')
+  };
+
   const [error, setError] = useState("");
+  const [validationError, setValidationError] = useState("");
   const stripe = useStripe();
   const elements = useElements();
   const appContext = useContext(AppContext);
-  console.log(appContext);
+  let deactivateSubmitBtn = true;
+  {appContext.user.activeUser ? deactivateSubmitBtn = !true : deactivateSubmitBtn = true};
+  {appContext.cart.items.length < 1 ? deactivateSubmitBtn = true : deactivateSubmitBtn = !true}
+  console.log(appContext.cart.items.length)
+
+  function getRandomArbitrary(min, max) {
+    return Math.round(Math.random() * (max - min) + min)
+  };
 
   function onChange(e) {
     // set the key = to the name property equal to the value typed
-    const updateItem = (data[e.target.name] = e.target.value);
+    let name = e.target.name;
+    let value = e.target.value;
+    if(name === 'state')value = value.toUpperCase();
+    console.log(`${JSON.stringify(data)}`)
+    const updateItem = (data[name] = value);
     // update the state data object
     setData({ ...data, updateItem });
-  }
+  };
 
   async function submitOrder() {
     // event.preventDefault();
-
+    if(data.firstName.length < 2) return setValidationError("Name cannot be left blank");
+    if(data.lastName.length < 2) return setValidationError("Name cannot be left blank");
+    if(data.address.length < 2) return setValidationError("Address cannot be left blank");
+    if(data.city.length < 2) return setValidationError("City cannot be left blank");
+    if(data.state.length < 2) return setValidationError("State cannot be left blank");
     // // Use elements.getElement to get a reference to the mounted Element.
     const cardElement = elements.getElement(CardElement);
 
@@ -40,61 +64,64 @@ function CheckoutForm() {
 
     const token = await stripe.createToken(cardElement);
     const userToken = Cookies.get("token");
+    console.log(token.token.id)
     const response = await fetch(`${API_URL}/orders`, {
       method: "POST",
       headers: userToken && { Authorization: `Bearer ${userToken}` },
       body: JSON.stringify({
         amount: Number(Math.round(appContext.cart.total + "e2") + "e-2"),
         dishes: appContext.cart.items,
+        firstName: data.firstName,
+        lastName: data.lastName,
         address: data.address,
         city: data.city,
         state: data.state,
         token: token.token.id,
       }),
     });
-
+    let custOrderId = token.token.id.slice(4);
+    alert(`Thank you for your order ${appContext.user.activeUser}!
+    Your order will be ready in approximately: ${getRandomArbitrary(10,30)} minutes
+    Transaction id: ${custOrderId}`)
+    pushToHome();
     if (!response.ok) {
       setError(response.statusText);
-      console.log("SUCCESS")
     }
-
-    // OTHER stripe methods you can use depending on app
-    // // or createPaymentMethod - https://stripe.com/docs/js/payment_intents/create_payment_method
-    // stripe.createPaymentMethod({
-    //   type: "card",
-    //   card: cardElement,
-    // });
-
-    // // or confirmCardPayment - https://stripe.com/docs/js/payment_intents/confirm_card_payment
-    // stripe.confirmCardPayment(paymentIntentClientSecret, {
-    //   payment_method: {
-    //     card: cardElement,
-    //   },
-    // });
   }
 
   return (
     <div className="paper">
-      <h5>Your information:</h5>
+      <h5>Cardholder information:</h5>
+      <small style={{color:"red", fontWeight:"bold"}}>{validationError}</small>
       <hr />
+      <FormGroup style={{ display: "flex" }}>
+        <div style={{ flex: "0.40", marginRight: "6%" }}>
+          <Label>First Name</Label>
+          <Input placeholder="John" name="firstName" onChange={onChange} required />
+        </div>
+        <div style={{ flex: "0.40", marginRight: 0 }}>
+          <Label>Last Name</Label>
+          <Input placeholder="Doe" name="lastName" onChange={onChange} required />
+        </div>
+      </FormGroup>
       <FormGroup style={{ display: "flex" }}>
         <div style={{ flex: "0.90", marginRight: 10 }}>
           <Label>Address</Label>
-          <Input name="address" onChange={onChange} />
+          <Input placeholder="123456 main st" name="address" onChange={onChange} required />
         </div>
       </FormGroup>
       <FormGroup style={{ display: "flex" }}>
-        <div style={{ flex: "0.65", marginRight: "6%" }}>
+        <div style={{ flex: "0.45", marginRight: "6%" }}>
           <Label>City</Label>
-          <Input name="city" onChange={onChange} />
+          <Input placeholder="New York" name="city" onChange={onChange} required />
         </div>
         <div style={{ flex: "0.25", marginRight: 0 }}>
           <Label>State</Label>
-          <Input name="state" onChange={onChange} />
+          <Input placeholder="NY" name="state" onChange={onChange} required />
         </div>
       </FormGroup>
-
-      <CardSection data={data} stripeError={error} submitOrder={submitOrder} />
+        <hr/>
+      <CardSection data={data} deactivateSubmitBtn={deactivateSubmitBtn} stripeError={error} submitOrder={submitOrder} required />
 
       <style jsx global>
         {`
@@ -103,7 +130,7 @@ function CheckoutForm() {
             box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
               0px 1px 1px 0px rgba(0, 0, 0, 0.14),
               0px 2px 1px -1px rgba(0, 0, 0, 0.12);
-            height: 550px;
+            height: 700px;
             padding: 30px;
             background: #fff;
             border-radius: 6px;

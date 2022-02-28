@@ -3,7 +3,6 @@ import Cart from "../components/cart"
 import {ApolloProvider,ApolloClient,HttpLink, InMemoryCache} from '@apollo/client';
 import RestaurantList from '../components/restaurantList';
 import { InputGroup, InputGroupAddon,Input} from "reactstrap";
-import DishList from "./dishes/[dish]";
 
 
 function Home() {
@@ -22,15 +21,14 @@ function Home() {
                 <InputGroup >
                 <InputGroupAddon addonType="append"> Search </InputGroupAddon>
                 <Input
-                    onChange={(e) =>
+                    onChange={(e) =>{
                     setQuery(e.target.value.toLocaleLowerCase())
-                    }
+                    }}
                     value={query}
                 />
                 </InputGroup><br></br>
             </div>
             <RestaurantList search={query} />
-            <DishList/>
             <Cart> </Cart>
         </ApolloProvider>
     );

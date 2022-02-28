@@ -1,7 +1,7 @@
 /* /pages/login.js */
 
 import React, { useState, useEffect, useContext } from "react";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import {
   Container,
   Row,
@@ -67,11 +67,10 @@ function Login(props) {
                   </FormGroup>
 
                   <FormGroup>
-                    {/* <span>
-                      <a href="">
-                        <small>Forgot Password?</small>
-                      </a>
-                    </span> */}
+                    <span>
+                        <small>Dont Have an Account?</small><br/>
+                        <a href={'/register'}><small>Sign up!</small></a>
+                    </span>
                     <Button
                       style={{ float: "right", width: 120 }}
                       color="primary"

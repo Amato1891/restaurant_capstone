@@ -13,7 +13,8 @@ import {
   Col} from "reactstrap";
 function Dishes({restId}){
   const [restaurantID, setRestaurantID] = useState()
-  const {addItem} = useContext(AppContext)
+  const {addItem, user} = useContext(AppContext)
+  console.log(user.activeUser)
 
 const GET_RESTAURANT_DISHES = gql`
   query($id: ID!) {
@@ -77,7 +78,7 @@ const GET_RESTAURANT_DISHES = gql`
         </>
         )}
         else{
-          return <h1> No Dishes</h1>
+          return <h3> {user.activeUser ? ('Select a restaurant to view its dishes') : ('Log in to view dishes from your favorite restaurants!')}</h3>
         }
     }
     export default Dishes

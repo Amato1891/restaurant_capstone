@@ -15,8 +15,7 @@ const title = "Food Fast";
 var {user} = useContext(AppContext);
 let userName = Cookie.get('name');
 let userEmail = Cookie.get('email');
-let activeUser = false;
-if(userName) activeUser = true;
+
 
   return (
     <div>
@@ -47,12 +46,12 @@ if(userName) activeUser = true;
         <Nav className="navbar navbar-dark bg-dark">
           <NavItem>
             <Link href="/">
-              <a className="navbar-brand">Home</a>
+              <a className="navbar-brand">Restaurants</a>
             </Link>
           </NavItem>
           <NavItem className="ml-auto">
-            {activeUser ? (
-              <h5>{`Welcome, ${userName}`}</h5>
+            {user.activeUser ? (
+              <h5>{`Welcome, ${user.activeUser}`}</h5>
             ) : (
               <Link href="/register">
                 <a className="nav-link"> Sign up</a>
@@ -60,7 +59,7 @@ if(userName) activeUser = true;
             )}
           </NavItem>
           <NavItem>
-            {activeUser ? (
+            {user.activeUser ? (
               <Link href="/">
                 <a
                   className="nav-link"

@@ -51,7 +51,7 @@ const Register = () => {
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} backdrop={'static'}>
             <ModalHeader toggle={this.toggle}>Account Created Successfully!</ModalHeader>
             <ModalBody>
-            {`Log in to your account to get started`}
+            {`Log in to get started viewing and ordering food from your favorite restaurants!`}
             </ModalBody>
             <ModalFooter>
               <Button color="primary" onClick={()=> Router.push("/login")}>Login</Button>{' '}
